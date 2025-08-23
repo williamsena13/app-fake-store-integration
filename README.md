@@ -18,13 +18,18 @@ SPA em React + Vite + TypeScript com PrimeReact para consumir a API Laravel do s
 
 ## 🔧 Instalação
 
-1. **Clone e instale dependências:**
+1. **Clone o repositório:**
 ```bash
-cd c:\laragon\www\app-fake-store-integration
+git clone https://github.com/williamsena13/app-fake-store-integration.git
+cd app-fake-store-integration
+```
+
+2. **Instale as dependências:**
+```bash
 yarn install
 ```
 
-2. **Configure variáveis de ambiente:**
+3. **Configure variáveis de ambiente:**
 ```bash
 cp .env.example .env
 ```
@@ -50,11 +55,11 @@ VITE_API_DEVELOPER_URL=http://api-fake-store-integration.test/api
 **PRODUCTION** (produção):
 ```env
 VITE_NODE_ENV=production
-VITE_CLIENT_ID="Bassena Dev"
+VITE_CLIENT_ID=demo
 VITE_API_PRODUCTION_URL=http://api-fakestore.bassena.com.br/api
 ```
 
-3. **Execute o projeto:**
+4. **Execute o projeto:**
 ```bash
 yarn dev
 ```
