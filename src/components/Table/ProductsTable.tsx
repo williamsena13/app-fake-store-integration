@@ -15,12 +15,15 @@ interface ProductsTableProps {
   loading?: boolean;
   totalRecords?: number;
   onPageChange?: (event: any) => void;
+  onSort?: (event: any) => void;
   currentPage?: number;
   rowsPerPage?: number;
   showPagination?: boolean;
   showHeader?: boolean;
   title?: string;
   showDates?: boolean;
+  sortField?: string;
+  sortOrder?: 1 | -1 | 0 | null | undefined;
 }
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ 
@@ -28,13 +31,17 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
   loading = false, 
   totalRecords = 0,
   onPageChange,
+  onSort,
   currentPage = 1,
   rowsPerPage = 20,
   showPagination = true,
   showHeader = true,
   title = 'Produtos',
-  showDates = true
+  showDates = true,
+  sortField,
+  sortOrder
 }) => {
+  const safeProducts = Array.isArray(products) ? products : [];
   const navigate = useNavigate();
   const [filters] = useState<any>({});
   const [expandedRows, setExpandedRows] = useState<any>(null);
@@ -97,7 +104,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
     if (!showHeader) return null;
     return (
       <div className="flex justify-content-between align-items-center">
-        <h5 className="m-0">{title} ({showPagination ? totalRecords : products.length})</h5>
+        <h5 className="m-0">{title} ({showPagination ? totalRecords : safeProducts.length})</h5>
       </div>
     );
   };
@@ -151,7 +158,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
 
   return (
     <DataTable
-      value={products}
+      value={safeProducts}
       loading={loading}
       paginator={showPagination}
       rows={showPagination ? rowsPerPage : undefined}
@@ -159,6 +166,9 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
       lazy={showPagination}
       first={showPagination ? (currentPage - 1) * rowsPerPage : undefined}
       onPage={showPagination ? onPageChange : undefined}
+      sortField={sortField}
+      sortOrder={sortOrder}
+      onSort={onSort}
       className="p-datatable-sm"
       emptyMessage="Nenhum produto encontrado"
       filters={filters}
@@ -183,18 +193,21 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
         field="title"
         header="Produto"
         body={titleBodyTemplate}
+        sortable
         style={{ minWidth: '300px' }}
       />
       <Column
         field="category.name"
         header="Categoria"
         body={categoryBodyTemplate}
+        sortable
         style={{ width: '150px', textAlign: 'center' }}
       />
       <Column
         field="price"
         header="Preço"
         body={priceBodyTemplate}
+        sortable
         style={{ width: '150px' }}
       />
       {showDates && (
@@ -206,6 +219,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
               <div>{formatDate(product.created_at)}</div>
             </div>
           )}
+          sortable
           style={{ width: '120px' }}
         />
       )}
@@ -218,6 +232,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({
               <div>{formatDate(product.updated_at)}</div>
             </div>
           )}
+          sortable
           style={{ width: '120px' }}
         />
       )}

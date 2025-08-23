@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from './client';
-import { Product, ProductsResponse, Stats, SyncResponse, ProductFilters, Category } from '@/types';
+import { Product, ProductsResponse, Stats, SyncResponse, ProductFilters, Category, ActivityLog } from '@/types';
 import { BackEndRoutes } from '../config/back-end-routes';
 import toast from 'react-hot-toast';
 
@@ -31,7 +31,7 @@ export const useProductQuery = (id: number) => {
     queryKey: ['product', id],
     queryFn: async (): Promise<Product> => {
       const response = await apiClient.get(BackEndRoutes.routes.CATALOGO.PRODUCTS.SHOW.replace(':id', id.toString()));
-      return response.data.data;
+      return response.data;
     },
     enabled: !!id,
   });
@@ -40,9 +40,9 @@ export const useProductQuery = (id: number) => {
 export const useProductsByCategoryQuery = (category: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['products', 'category', category],
-    queryFn: async (): Promise<Product[]> => {
+    queryFn: async (): Promise<ProductsResponse> => {
       const response = await apiClient.get(`${BackEndRoutes.routes.CATALOGO.PRODUCTS.LIST}?category=${encodeURIComponent(category)}&per_page=100`);
-      return response.data.data;
+      return response.data;
     },
     enabled: enabled && !!category,
     staleTime: STALE_TIME_5_MIN,
@@ -54,7 +54,7 @@ export const useCategoriesQuery = () => {
     queryKey: ['categories'],
     queryFn: async (): Promise<Category[]> => {
       const response = await apiClient.get(BackEndRoutes.routes.CATALOGO.CATEGORIES);
-      return response.data.data;
+      return response.data;
     },
     staleTime: STALE_TIME_10_MIN,
   });
@@ -64,7 +64,7 @@ export const useStatsQuery = () => {
     queryKey: ['stats'],
     queryFn: async (): Promise<Stats> => {
       const response = await apiClient.get(BackEndRoutes.routes.CATALOGO.STATS);
-      return response.data.data;
+      return response.data;
     },
     staleTime: STALE_TIME_10_MIN,
   });
@@ -76,9 +76,21 @@ export const useCheapestProductsQuery = () => {
     queryKey: ['products', 'cheapest'],
     queryFn: async (): Promise<Product[]> => {
       const response = await apiClient.get(`${BackEndRoutes.routes.CATALOGO.PRODUCTS.LIST}?sort=price&order=asc&per_page=5`);
-      return response.data.data.data;
+      return response.data.data;
     },
     staleTime: STALE_TIME_10_MIN,
+  });
+};
+
+export const useProductActivityQuery = (id: number) => {
+  return useQuery({
+    queryKey: ['product', id, 'activity'],
+    queryFn: async (): Promise<ActivityLog[]> => {
+      const response = await apiClient.get(BackEndRoutes.routes.CATALOGO.PRODUCTS.ACTIVITY.replace(':id', id.toString()));
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: STALE_TIME_5_MIN,
   });
 };
 

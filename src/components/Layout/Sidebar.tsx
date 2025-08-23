@@ -15,9 +15,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       path: FrontEndRoutes.HOME
     },
     {
-      label: 'Produtos',
-      icon: 'pi pi-shopping-cart',
-      path: FrontEndRoutes.PRODUCTS.LIST
+      label: 'Dashboard',
+      icon: 'pi pi-chart-bar',
+      path: FrontEndRoutes.STATS
     },
     {
       label: 'Categorias',
@@ -25,10 +25,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       path: FrontEndRoutes.CATEGORIES
     },
     {
-      label: 'Dashboard',
-      icon: 'pi pi-chart-bar',
-      path: FrontEndRoutes.STATS
+      label: 'Produtos',
+      icon: 'pi pi-shopping-cart',
+      path: FrontEndRoutes.PRODUCTS.LIST
     },
+
     {
       label: 'Sincronização',
       icon: 'pi pi-sync',

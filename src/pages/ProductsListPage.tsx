@@ -1,39 +1,31 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
 import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Button } from 'primereact/button';
 import { useProductsQuery } from '../api/products';
 import { ProductFilters as IProductFilters } from '../types';
-import { parseFiltersFromUrl, buildUrlFromFilters } from '../lib/query';
 import ProductFiltersModal from '../components/Filters/ProductFiltersModal';
 import ProductsTable from '../components/Table/ProductsTable';
 
 const ProductsListPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [showFiltersModal, setShowFiltersModal] = useState(false);
   
-  const initialFilters: IProductFilters = useMemo(() => ({
+  const [filters, setFilters] = useState<IProductFilters>({
     page: 1,
-    per_page: 20,
-    ...parseFiltersFromUrl(searchParams)
-  }), [searchParams]);
-
-  const [filters, setFilters] = useState<IProductFilters>(initialFilters);
+    per_page: 20
+  });
+  
+  const [sortField, setSortField] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<1 | -1 | 0 | null>(1);
 
   const { data, isLoading, error } = useProductsQuery(filters);
   console.log(data);
 
   const categories = useMemo(() => {
-    if (!data?.data?.data || !Array.isArray(data.data.data)) return [];
-    const uniqueCategories = [...new Set(data.data.data.map(p => p.category.name))];
+    if (!data?.data || !Array.isArray(data.data)) return [];
+    const uniqueCategories = [...new Set(data.data.map(p => p.category.name))];
     return uniqueCategories.sort();
   }, [data]);
-
-  useEffect(() => {
-    const urlParams = buildUrlFromFilters(filters);
-    setSearchParams(urlParams);
-  }, [filters, setSearchParams]);
 
   const handleFiltersChange = (newFilters: IProductFilters) => {
     setFilters(newFilters);
@@ -44,6 +36,17 @@ const ProductsListPage: React.FC = () => {
       ...prev,
       page: event.page + 1,
       per_page: event.rows
+    }));
+  };
+
+  const handleSort = (event: any) => {
+    setSortField(event.sortField);
+    setSortOrder(event.sortOrder);
+    setFilters(prev => ({
+      ...prev,
+      sort: event.sortField,
+      order: event.sortOrder === 1 ? 'asc' : 'desc',
+      page: 1
     }));
   };
 
@@ -65,9 +68,9 @@ const ProductsListPage: React.FC = () => {
         <div className="flex justify-content-between align-items-center">
           <div>
             <h1 className="page-title">Catálogo de Produtos</h1>
-            {data?.data && (
+            {data && (
               <p className="page-subtitle">
-                {data.data.total} produtos encontrados
+                {data?.total || 0} produtos encontrados
               </p>
             )}
           </div>
@@ -100,12 +103,15 @@ const ProductsListPage: React.FC = () => {
         ) : (
           <>
             <ProductsTable
-              products={data?.data?.data || []}
+              products={data?.data || []}
               loading={isLoading}
-              totalRecords={data?.data?.total || 0}
+              totalRecords={data?.total || 0}
               onPageChange={handlePageChange}
-              currentPage={data?.data?.current_page || 1}
-              rowsPerPage={data?.data?.per_page || 20}
+              onSort={handleSort}
+              currentPage={data?.current_page || 1}
+              rowsPerPage={data?.per_page || 20}
+              sortField={sortField}
+              sortOrder={sortOrder}
             />
           </>
         )}

@@ -3,6 +3,7 @@ const routes: any = {
     PRODUCTS: {
       LIST: '/catalogo/products',
       SHOW: '/catalogo/products/:id',
+      ACTIVITY: '/catalogo/products/:id/activity',
     },
     CATEGORIES: '/catalogo/categories',
     STATS: '/catalogo/stats',
