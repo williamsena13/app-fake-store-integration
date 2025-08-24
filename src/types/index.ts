@@ -21,13 +21,18 @@ export interface Product {
 }
 
 export interface ProductsResponse {
-  data: {
-    data: Product[];
-    current_page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
+  current_page: number;
+  data: Product[];
+  per_page: number;
+  total: number;
+  last_page: number;
+  first_page_url: string;
+  from: number;
+  last_page_url: string;
+  next_page_url: string | null;
+  path: string;
+  prev_page_url: string | null;
+  to: number;
 }
 
 export interface Stats {
@@ -109,5 +114,21 @@ export interface ProductFilters {
 }
 
 export interface CategoriesResponse {
+  success: boolean;
   data: Category[];
+}
+
+export interface ActivityLog {
+  id: number;
+  description: string;
+  event: 'created' | 'updated' | 'deleted';
+  properties: {
+    attributes?: Record<string, any>;
+    old?: Record<string, any>;
+  };
+  created_at: string;
+  causer: {
+    id?: number;
+    name: string;
+  };
 }

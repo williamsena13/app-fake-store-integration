@@ -7,6 +7,7 @@ import { router } from './router';
 import './styles/index.css';
 import './styles/global.css';
 import './styles/modern.css';
+import './styles/timeline.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

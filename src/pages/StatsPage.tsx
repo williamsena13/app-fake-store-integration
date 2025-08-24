@@ -38,10 +38,10 @@ const StatsPage: React.FC = () => {
 
   // Dados para o gráfico de categorias
   const chartData = {
-    labels: stats.by_category.map(cat => cat.category),
+    labels: stats.by_category?.map(cat => cat.category) || [],
     datasets: [
       {
-        data: stats.by_category.map(cat => cat.total),
+        data: stats.by_category?.map(cat => cat.total) || [],
         backgroundColor: [
           '#FF6384',
           '#36A2EB',
@@ -114,7 +114,7 @@ const StatsPage: React.FC = () => {
                 <i className="pi pi-tags"></i>
               </div>
               <div className="stats-card-content">
-                <div className="stats-card-value">{stats.by_category.length}</div>
+                <div className="stats-card-value">{stats.by_category?.length || 0}</div>
                 <div className="stats-card-label">Categorias</div>
               </div>
             </div>
@@ -128,7 +128,7 @@ const StatsPage: React.FC = () => {
                 <i className="pi pi-star"></i>
               </div>
               <div className="stats-card-content">
-                <div className="stats-card-value">{stats.top5_expensive.length}</div>
+                <div className="stats-card-value">{stats.top5_expensive?.length || 0}</div>
                 <div className="stats-card-label">Top Produtos</div>
               </div>
             </div>
@@ -153,7 +153,7 @@ const StatsPage: React.FC = () => {
         <div className="col-12 md:col-6">
           <Card title="Detalhes por Categoria">
             <DataTable
-              value={stats.by_category}
+              value={Array.isArray(stats.by_category) ? stats.by_category : []}
               className="p-datatable-sm"
               emptyMessage="Nenhuma categoria encontrada"
             >
@@ -186,7 +186,7 @@ const StatsPage: React.FC = () => {
         <div className="col-12 md:col-6">
           <Card title="Top 5 Produtos Mais Caros">
             <ProductsTable
-              products={stats.top5_expensive.map(product => ({
+              products={Array.isArray(stats.top5_expensive) ? stats.top5_expensive.map(product => ({
                 ...product,
                 category: {
                   id: 0,
@@ -194,7 +194,7 @@ const StatsPage: React.FC = () => {
                 },
                 created_at: '',
                 updated_at: ''
-              }))}
+              })) : []}
               loading={false}
               showPagination={false}
               showHeader={false}
@@ -206,7 +206,7 @@ const StatsPage: React.FC = () => {
         <div className="col-12 md:col-6">
           <Card title="Top 5 Produtos Mais Baratos">
             <ProductsTable
-              products={cheapestProducts || []}
+              products={Array.isArray(cheapestProducts) ? cheapestProducts : []}
               loading={cheapestLoading}
               showPagination={false}
               showHeader={false}
