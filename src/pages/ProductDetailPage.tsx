@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
@@ -6,6 +6,7 @@ import { Tag } from 'primereact/tag';
 
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useProductQuery } from '../api/products';
+import ProductActivityLog from '../components/ActivityLog/ProductActivityLog';
 import { formatCurrency } from '../lib/format';
 import {FrontEndRoutes} from "@/config/front-end-routes.ts";
 
@@ -14,9 +15,18 @@ const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
   
   const productId = parseInt(id || '0');
   const { data: product, isLoading, error } = useProductQuery(productId);
+
+  useEffect(() => {
+    if (product?.image_url) {
+      setImageSrc(product.image_url);
+      setImageError(false);
+      setImageLoading(true);
+    }
+  }, [product]);
 
   if (isLoading) {
     return (
@@ -72,11 +82,12 @@ const ProductDetailPage: React.FC = () => {
                 </div>
               )}
               <img
-                src={imageError ? 'https://via.placeholder.com/400x400?text=Imagem+Indispon%C3%ADvel' : product.image_url}
+                src={imageError ? 'https://via.placeholder.com/400x400?text=Imagem+Indispon%C3%ADvel' : imageSrc}
                 alt={product.title}
                 className={`product-detail-image ${imageLoading ? 'loading' : ''}`}
                 onLoad={() => setImageLoading(false)}
                 onError={() => {
+                  console.log('Erro ao carregar imagem:', imageSrc);
                   setImageError(true);
                   setImageLoading(false);
                 }}
@@ -126,6 +137,12 @@ const ProductDetailPage: React.FC = () => {
               </div>
             </div>
           </Card>
+        </div>
+      </div>
+
+      <div className="grid mt-4">
+        <div className="col-12">
+          <ProductActivityLog productId={productId} />
         </div>
       </div>
     </div>

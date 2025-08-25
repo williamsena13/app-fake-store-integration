@@ -1,9 +1,10 @@
 import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
-import { ApiError } from '../types';
+
+import { getBaseURL } from '../config/environment';
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: getBaseURL(),
   timeout: 10000,
 });
 
@@ -21,10 +22,16 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<ApiError>) => {
-    if (error.response?.data?.error) {
+  (error: AxiosError<any>) => {
+
+    if (error.response?.data?.error && typeof error.response.data.error === 'string') {
+      const errorMessage = error.response.data.error;
+      toast.error(errorMessage);
+      return Promise.reject(new Error(errorMessage));
+    }
+
+    if (error.response?.data?.error && typeof error.response.data.error === 'object') {
       const apiError = error.response.data.error;
-      
       toast.error(`${apiError.message} (ID: ${apiError.request_id})`);
       
       if (apiError.status === 400 && apiError.code === 'integration.missing_client_id') {

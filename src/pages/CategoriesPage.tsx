@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -11,7 +11,12 @@ import { Category } from '@/types';
 
 
 const CategoryProductsComponent: React.FC<{ category: Category }> = ({ category }) => {
-  const { data: products, isLoading: productsLoading } = useProductsByCategoryQuery(category.name, true);
+  const { data: productsResponse, isLoading: productsLoading, refetch } = useProductsByCategoryQuery(category.name, true);
+  const products = productsResponse?.data || [];
+  
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   <div className="col-12 sm:col-12 lg:col-8">
     </div>
   const productTemplate = (product: any) => {
@@ -47,21 +52,21 @@ const CategoryProductsComponent: React.FC<{ category: Category }> = ({ category 
       <h5 className="mb-3 flex align-items-center gap-2">
         <i className="pi pi-tag text-primary"></i>
         Produtos da categoria "{category.name}"
-        <span className="p-tag p-tag-secondary ml-2">{products?.length || 0} produtos</span>
+        <span className="p-tag p-tag-secondary ml-2">{products.length} produtos</span>
       </h5>
       {productsLoading ? (
         <div className="text-center p-4">
           <ProgressSpinner style={{ width: '2rem', height: '2rem' }} />
           <p className="mt-2 text-sm text-gray-600">Carregando produtos...</p>
         </div>
-      ) : !products || products.length === 0 ? (
+      ) : products.length === 0 ? (
         <div className="text-center text-gray-500 p-4">
           <i className="pi pi-inbox text-4xl mb-3"></i>
           <p>Nenhum produto encontrado nesta categoria</p>
         </div>
       ) : (
         <div className="grid">
-          {products.map((product) => productTemplate(product))}
+          {products.map((product: any) => productTemplate(product))}
         </div>
       )}
     </div>
@@ -84,7 +89,7 @@ const CategoriesPage: React.FC = () => {
   const renderHeader = () => {
     return (
       <div style={{ padding: '0.25rem', textAlign: 'center' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: '500' }}>Categorias ({categories?.length || 0})</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: '500' }}>Categorias ({Array.isArray(categories) ? categories.length : 0})</span>
       </div>
     );
   };
@@ -146,7 +151,7 @@ const CategoriesPage: React.FC = () => {
 
       <Card>
         <DataTable 
-          value={categories} 
+          value={Array.isArray(categories) ? categories : []} 
           paginator 
           rows={10}
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
